@@ -101,11 +101,12 @@ function storeToken(token) {
  * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
  */
 function listMajors(auth) {
+
   var sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
     auth: auth,
     spreadsheetId: '1EV54MthzfXwtuzG3S_qoR0Z3g2W_Ylti1VV2UgmBv9k',
-    range: 'Class Data!A2:E',
+    range: 'Fall 2016!B2:J',
   }, function(err, response) {
     if (err) {
       console.log('The API returned an error: ' + err);
@@ -119,7 +120,7 @@ function listMajors(auth) {
       for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
         // Print columns A and E, which correspond to indices 0 and 4.
-        console.log('%s, %s', row[0], row[4]);
+        console.log('%s, %s', row[0], row[3]);
       }
     }
   });
