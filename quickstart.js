@@ -1,4 +1,5 @@
 var fs = require('fs');
+var cheerio = require('cheerio')
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
@@ -101,7 +102,7 @@ function storeToken(token) {
  * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
  */
 function listMajors(auth) {
-
+  var template = fs.readFileSync('profiletemplate.html', 'utf-8')
   var sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
     auth: auth,
@@ -116,11 +117,24 @@ function listMajors(auth) {
     if (rows.length == 0) {
       console.log('No data found.');
     } else {
-      console.log('Name, Major:');
       for (var i = 0; i < rows.length; i++) {
+        let $ = cheerio.load(template);
         var row = rows[i];
-        // Print columns A and E, which correspond to indices 0 and 4.
-        console.log('%s, %s', row[0], row[3]);
+        // Write info to doc
+        var id = row[0].replace(/([^a-zA-Z]|\s)/g, "").toLowerCase(); //Remove any non-alpha characters
+        $('.name').html(row[0]);
+        $('.major').html(row[2]);
+        $('.year').html(row[3]);
+        $('.project').html(row[4]);
+        $('.skills').html(row[5]);
+        $('.group').html(row[6]);
+        $('.project').html(row[7]);
+        $('.schedule').html(row[8]);
+        fs.writeFile('profiles/' + id + '.html', $.html(), (err) => {
+          if (err) throw err;
+          //TODO Pass in current name so we can know if we were unable to parse name
+          console.log('file is saved');
+        });
       }
     }
   });
