@@ -3,6 +3,7 @@ var cheerio = require('cheerio')
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
+var pdf = require('html-pdf');
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
@@ -10,6 +11,15 @@ var SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
 var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
+if (process.argv.length > 3) {
+  console.log('Usage: node ' + path.basename + '[sheet]')
+  System.exit(0);
+} else if (process.argv.length == 3) {
+  var sheet = process.argv[2]
+} else {
+  var sheet = 'Spring 2017'
+}
+
 
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -107,7 +117,7 @@ function listMajors(auth) {
   sheets.spreadsheets.values.get({
     auth: auth,
     spreadsheetId: '1EV54MthzfXwtuzG3S_qoR0Z3g2W_Ylti1VV2UgmBv9k',
-    range: 'Fall 2016!B2:J',
+    range: sheet + '!B2:J',
   }, function(err, response) {
     if (err) {
       console.log('The API returned an error: ' + err);
@@ -130,10 +140,10 @@ function listMajors(auth) {
         $('.group').html(row[6]);
         $('.project').html(row[7]);
         $('.schedule').html(row[8]);
-        fs.writeFile('profiles/' + id + '.html', $.html(), (err) => {
-          if (err) throw err;
-          //TODO Pass in current name so we can know if we were unable to parse name
-          console.log('file is saved');
+        var options = {"height": "10.5in", "width": "8in"};
+        pdf.create($.html(), options).toFile('profiles/' + id + '.pdf', function(err, res) {
+          if (err) return console.log(err);
+          console.log(res); // { filename: '/app/businesscard.pdf' }
         });
       }
     }
