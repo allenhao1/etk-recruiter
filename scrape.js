@@ -2,6 +2,7 @@
 var page = require('webpage').create();
 var login = 'http://www.whenisgood.net/Login';
 var home = 'http://whenisgood.net/35rxcyk/results/jger2xs';
+var conf = require('./conf.json')
 
 page.open(login, function (status) {
     if (status !== 'success') {
@@ -10,8 +11,8 @@ page.open(login, function (status) {
         phantom.exit(1);
     } else {
         page.evaluate(function(){
-            $("input[name=loginEmail]").val("") ;
-            $("input[name=password]").val("") ;
+            $("input[name=loginEmail]").val(conf['email']) ;
+            $("input[name=password]").val(conf['password']) ;
             $("input[type=submit]").click() ;
         });
         setTimeout(function(){
