@@ -23,31 +23,13 @@ var spooky = new Spooky({
         }
         var code = '2xdzp5k';
         var id = 'igjq25h';
-        spooky.start('http://www.whenisgood.net/Login', function() {
-          this.echo(this.getTitle());
-        });
-        spooky.then([{conf:conf}, function() {
-          //Log into the page
-          this.fillSelectors("body > div.textContent > form",
-            {"input[name='loginEmail']": conf['email'], "input[name='loginPassword']" : conf['password']}, true);
-        }]);
-        spooky.then(function () {
-          this.echo(this.getTitle());
-        });
-        spooky.thenOpen('http://whenisgood.net/' + id + '/results/' + code, function(){
-          this.echo(this.getTitle());
+        var site = 'http://whenisgood.net/' + id + '/results/' + code;
+        spooky.start(site, function() {
+          this.emit('hello', this.getTitle());
         });
         spooky.then(function () {
-          this.capture('example.png');
-          var html  = this.getElementInfo('body > script:nth-child(15)').html;
-          // this.echo(html)
-          // eval(html)
-          // this.echo(respondents)
-
-          // this.echo(a)
-          // this.echo(this.getElement('body > script:nth-child(15)').html);
-          // var a = this.getHTML();
-
+          html  = this.getElementInfo('body > script:nth-child(15)').html;
+          this.emit('eval', html);
 
         });
         spooky.run();
@@ -70,6 +52,20 @@ spooky.on('console', function (line) {
     console.log(line);
 });
 */
+spooky.on('eval', function(text){
+  var unwanted  = /disableSelection.+;|paintCanDos\(\);|mySlider\(\);/g // Contains missing functions and space
+  console.log(text)
+  text = text.replace(unwanted, " ")
+  console.log(text)
+  console.log(typeof(text))
+  debugger
+  eval(text)
+  for (var i in respondents) {
+    console.log(respondents[i]);
+  }
+  console.log("test")
+  // console.log(respondents)
+})
 
 spooky.on('hello', function (greeting) {
     console.log(greeting);
